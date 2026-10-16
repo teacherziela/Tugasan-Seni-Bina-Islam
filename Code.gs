@@ -35,11 +35,11 @@ function setupDashboard(){
 function doPost(e){
   const lock=LockService.getScriptLock();lock.waitLock(30000);
   try{
-    const p=JSON.parse(e.postData.contents);
+    const p=JSON.parse((e.parameter&&e.parameter.payload)||e.postData.contents);
     for(const k of ['nama','kelas','tajuk','fungsi','ciri','base64','fileName','mimeType'])if(!p[k])throw Error('Maklumat tidak lengkap: '+k);
     if(!['application/pdf','image/jpeg','image/png'].includes(p.mimeType))throw Error('Jenis fail tidak dibenarkan');
     if(!/^1 (Adil|Gigih|Cendekia|Yakin|Bestari|Tekun|Usaha)$/.test(p.kelas))throw Error('Kelas tidak sah');
-    const bytes=Utilities.base64Decode(p.base64);if(bytes.length>8*1024*1024)throw Error('Fail terlalu besar');
+    const bytes=Utilities.base64Decode(p.base64);// Tiada had 8 MB buatan aplikasi; had sebenar tertakluk kepada Google Apps Script.
     const clean=s=>String(s).replace(/[\r\n\t]/g,' ').slice(0,120).replace(/^[=+@-]/,"'");
     const id=Utilities.getUuid().slice(0,8).toUpperCase();
     const ext=p.mimeType==='application/pdf'?'.pdf':p.mimeType==='image/png'?'.png':'.jpg';
@@ -50,4 +50,7 @@ function doPost(e){
     return out({ok:true,id});
   }catch(err){return out({ok:false,error:String(err.message||err)});}finally{lock.releaseLock();}
 }
-function out(obj){return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON)}
+function out(obj){
+  const json=JSON.stringify({type:'HISTORYVERSE_UPLOAD_RESULT',...obj}).replace(/</g,'\\u003c');
+  return HtmlService.createHtmlOutput('<!doctype html><html><body><p>'+ (obj.ok?'Penghantaran berjaya. ID: '+obj.id:'Penghantaran gagal.') +'</p><script>window.top.postMessage('+json+', "*");<\\/script></body></html>');
+}
