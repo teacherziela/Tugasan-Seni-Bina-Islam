@@ -52,5 +52,5 @@ function doPost(e){
 }
 function out(obj){
   const json=JSON.stringify({type:'HISTORYVERSE_UPLOAD_RESULT',...obj}).replace(/</g,'\\u003c');
-  return HtmlService.createHtmlOutput('<!doctype html><html><body><p>'+ (obj.ok?'Penghantaran berjaya. ID: '+obj.id:'Penghantaran gagal.') +'</p><script>window.top.postMessage('+json+', "*");<\\/script></body></html>');
+  return HtmlService.createHtmlOutput('<!doctype html><html><body><p>'+ (obj.ok?'Penghantaran berjaya. ID: '+obj.id:'Penghantaran gagal.') +'</p><script>window.top.postMessage('+json+', "*");<\/script></body></html>');
 }
