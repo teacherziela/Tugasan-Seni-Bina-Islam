@@ -51,6 +51,14 @@ function doPost(e){
   }catch(err){return out({ok:false,error:String(err.message||err),token});}finally{lock.releaseLock();}
 }
 function out(obj){
+  // HtmlService iframe perlu tag penutup script HTML yang sebenar.
+  // <\\/script> menyebabkan JavaScript pengesahan tidak berjalan.
   const json=JSON.stringify({type:'HISTORYVERSE_UPLOAD_RESULT',...obj}).replace(/</g,'\\u003c');
-  return HtmlService.createHtmlOutput('<!doctype html><html><body><p>'+ (obj.ok?'Penghantaran berjaya. ID: '+obj.id:'Penghantaran gagal.') +'</p><script>window.top.postMessage('+json+', "*");<\/script></body></html>');
+  const closingTag='</scr'+'ipt>';
+  return HtmlService.createHtmlOutput(
+    '<!doctype html><html><head><meta charset="utf-8"></head><body>'+
+    '<p>'+(obj.ok?'Penghantaran berjaya. ID: '+obj.id:'Penghantaran gagal: '+String(obj.error||''))+'</p>'+
+    '<script>window.top.postMessage('+json+', "*");'+closingTag+
+    '</body></html>'
+  );
 }
