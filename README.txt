@@ -10,3 +10,5 @@ Google Sheet dan folder Drive telah ditetapkan dalam Code.gs.
 7. Uji satu penghantaran gambar/PDF dan semak tab Penghantaran serta folder Drive.
 
 Nota: Penghantaran belum aktif sehingga Web App Apps Script dideploy dan URL dimasukkan.
+
+Kemas kini: imej/ mengandungi 6 ilustrasi SVG untuk galeri visual. Muat naik keseluruhan folder imej bersama index.html ke GitHub Pages.
