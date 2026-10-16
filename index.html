@@ -40,13 +40,13 @@ document.getElementById('form').addEventListener('submit',async event=>{
   const onMessage=e=>{
    const d=e.data;if(!d||d.type!=='HISTORYVERSE_UPLOAD_RESULT'||d.token!==payload.token||complete)return;
    complete=true;cleanup();
-   if(d.ok){statusEl.textContent='✅ BERJAYA DIHANTAR! Nombor rujukan: '+d.id;submitBtn.textContent='✅ Sudah Dihantar';submitBtn.disabled=true}
-   else{statusEl.textContent='❌ Tidak berjaya: '+(d.error||'Ralat pelayan');submitBtn.disabled=false;submitBtn.textContent='Cuba Hantar Semula'}
+   if(d.ok){statusEl.textContent='✅ BERJAYA DIHANTAR! Nombor rujukan: '+d.id;submitBtn.textContent='✅ Sudah Dihantar';submitBtn.disabled=true;sessionStorage.setItem('hv_uploaded_'+payload.nama+'_'+payload.kelas,d.id)}
+   else{statusEl.textContent='⚠️ Pelayan melaporkan masalah: '+(d.error||'Tidak diketahui')+'. Maklumkan guru untuk semak rekod.';submitBtn.disabled=true;submitBtn.textContent='Semak Dengan Guru'}
   };
   window.addEventListener('message',onMessage);
-  statusEl.textContent='⏳ Menghantar '+f.name+'. Kekalkan halaman terbuka sehingga nombor rujukan muncul.';
+  statusEl.textContent='⏳ Menghantar '+f.name+'. Kekalkan halaman terbuka sehingga pengesahan diterima.';
   form.submit();
-  setTimeout(()=>{if(!complete){complete=true;cleanup();statusEl.textContent='⚠️ Belum dapat mengesahkan penghantaran. Maklumkan guru untuk semak Google Sheet dahulu sebelum cuba lagi.';submitBtn.disabled=false;submitBtn.textContent='Cuba Hantar Semula'}},120000);
- }catch(err){statusEl.textContent='❌ Fail gagal diproses: '+err.message;submitBtn.disabled=false;submitBtn.textContent='Cuba Hantar Semula'}
+  setTimeout(()=>{if(!complete){complete=true;cleanup();statusEl.textContent='📩 Fail telah dihantar untuk diproses, tetapi pengesahan tidak diterima. Tugasan MUNGKIN SUDAH MASUK seperti rekod murid lain. JANGAN hantar semula. Minta guru semak nama dalam Google Sheet.';submitBtn.disabled=true;submitBtn.textContent='📩 Sila Semak Dengan Guru'}},120000);
+ }catch(err){statusEl.textContent='⚠️ Tidak dapat memastikan penghantaran: '+err.message+'. Maklumkan guru untuk semak rekod sebelum mencuba lagi.';submitBtn.disabled=true;submitBtn.textContent='Semak Dengan Guru'}
 });
 </script></body></html>
