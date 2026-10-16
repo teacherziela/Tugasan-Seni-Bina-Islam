@@ -37,12 +37,12 @@ function doPost(e){
   try{
     const p=JSON.parse((e.parameter&&e.parameter.payload)||e.postData.contents);token=p.token||'';
     for(const k of ['nama','kelas','tajuk','fungsi','ciri','base64','fileName','mimeType'])if(!p[k])throw Error('Maklumat tidak lengkap: '+k);
-    if(!['application/pdf','image/jpeg','image/png'].includes(p.mimeType))throw Error('Jenis fail tidak dibenarkan');
+    if(!['application/pdf','image/jpeg','image/png','image/heic','image/heif'].includes(p.mimeType))throw Error('Jenis fail tidak dibenarkan');
     if(!/^1 (Adil|Gigih|Cendekia|Yakin|Bestari|Tekun|Usaha)$/.test(p.kelas))throw Error('Kelas tidak sah');
     const bytes=Utilities.base64Decode(p.base64);// Tiada had 8 MB buatan aplikasi; had sebenar tertakluk kepada Google Apps Script.
     const clean=s=>String(s).replace(/[\r\n\t]/g,' ').slice(0,120).replace(/^[=+@-]/,"'");
     const id=Utilities.getUuid().slice(0,8).toUpperCase();
-    const ext=p.mimeType==='application/pdf'?'.pdf':p.mimeType==='image/png'?'.png':'.jpg';
+    const ext=({'application/pdf':'.pdf','image/png':'.png','image/jpeg':'.jpg','image/heic':'.heic','image/heif':'.heif'})[p.mimeType];
     const file=DriveApp.getFolderById(FOLDER_ID).createFile(Utilities.newBlob(bytes,p.mimeType,id+'_'+clean(p.nama)+ext));
     const sh=SpreadsheetApp.openById(SHEET_ID).getSheetByName(TAB);
     if(!sh)throw Error('Jalankan setupDashboard dahulu');
