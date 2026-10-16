@@ -33,9 +33,9 @@ function setupDashboard(){
   summary.autoResizeColumns(1,2);
 }
 function doPost(e){
-  const lock=LockService.getScriptLock();lock.waitLock(30000);
+  const lock=LockService.getScriptLock();lock.waitLock(30000);let token='';
   try{
-    const p=JSON.parse((e.parameter&&e.parameter.payload)||e.postData.contents);
+    const p=JSON.parse((e.parameter&&e.parameter.payload)||e.postData.contents);token=p.token||'';
     for(const k of ['nama','kelas','tajuk','fungsi','ciri','base64','fileName','mimeType'])if(!p[k])throw Error('Maklumat tidak lengkap: '+k);
     if(!['application/pdf','image/jpeg','image/png'].includes(p.mimeType))throw Error('Jenis fail tidak dibenarkan');
     if(!/^1 (Adil|Gigih|Cendekia|Yakin|Bestari|Tekun|Usaha)$/.test(p.kelas))throw Error('Kelas tidak sah');
@@ -47,8 +47,8 @@ function doPost(e){
     const sh=SpreadsheetApp.openById(SHEET_ID).getSheetByName(TAB);
     if(!sh)throw Error('Jalankan setupDashboard dahulu');
     sh.appendRow([new Date(),id,clean(p.nama),clean(p.kelas),clean(p.tajuk),clean(p.fungsi),clean(p.ciri),file.getUrl(),'Belum Semak','','']);
-    return out({ok:true,id});
-  }catch(err){return out({ok:false,error:String(err.message||err)});}finally{lock.releaseLock();}
+    return out({ok:true,id,token:p.token||''});
+  }catch(err){return out({ok:false,error:String(err.message||err),token});}finally{lock.releaseLock();}
 }
 function out(obj){
   const json=JSON.stringify({type:'HISTORYVERSE_UPLOAD_RESULT',...obj}).replace(/</g,'\\u003c');
